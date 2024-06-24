@@ -8,13 +8,20 @@ const fontSans = FontSans({
 
 export default function App({ Component, pageProps }) {
   return (
-    <main
-      className={cn(
-        "min-h-screen bg-background font-sans antialiased",
-        fontSans.variable
-      )}
-    >
-      <Component {...pageProps} />
-    </main>
+    <>
+      <style jsx global>{`
+        html {
+          font-family: ${fontSans.style.fontFamily};
+        }
+      `}</style>
+      <main
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable
+        )}
+      >
+        <Component {...pageProps} />
+      </main>
+    </>
   );
 }

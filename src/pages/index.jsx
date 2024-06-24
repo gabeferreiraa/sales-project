@@ -1,15 +1,25 @@
-import { Inter } from "next/font/google";
+// src/pages/index.jsx
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import Organization from "@/components/customComponents/Organization";
-
-const inter = Inter({ subsets: ["latin"] });
+import OrgImage from "@/components/customComponents/OrgImage";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
   const [newOrg, setNewOrg] = useState("");
+  const [newStatus, setNewStatus] = useState("conversation");
   const [orgList, setOrgList] = useState(null);
 
-  // Load organization data from local storage when the component mounts
+  // Load organization data
   useEffect(() => {
     const storedOrgs = localStorage.getItem("orgList");
     if (storedOrgs) {
@@ -19,10 +29,10 @@ export default function Home() {
     }
   }, []);
 
-  // Save organization data to local storage whenever orgList changes
+  // Save organization data
   useEffect(() => {
     if (orgList == null) {
-      return
+      return;
     }
     localStorage.setItem("orgList", JSON.stringify(orgList));
   }, [orgList]);
@@ -31,12 +41,16 @@ export default function Home() {
     setNewOrg(event.target.value);
   };
 
+  const handleStatusChange = (value) => {
+    setNewStatus(value);
+  };
+
   const addOrg = () => {
     const org = {
       id: orgList.length === 0 ? 1 : orgList[orgList.length - 1].id + 1,
       orgName: newOrg,
       temperature: "",
-      status: "",
+      status: newStatus,
       users: [],
     };
     setOrgList([...orgList, org]);
@@ -46,37 +60,83 @@ export default function Home() {
     setOrgList(orgList.filter((org) => org.id !== id));
   };
 
+  const addUserToOrg = (orgId, newUser) => {
+    const updatedOrgs = orgList.map((org) => {
+      if (org.id === orgId) {
+        return { ...org, users: [...org.users, newUser] };
+      }
+      return org;
+    });
+    setOrgList(updatedOrgs);
+  };
+
   if (orgList == null) {
-    return (
-    <p> loading</p>
-    )
+    return <p>loading</p>;
   }
+
+  const statuses = [
+    "conversation",
+    "prospect",
+    "outbound",
+    "demo",
+    "sale",
+    "dead",
+  ];
+
   return (
-    <div className="block">
-      <div className="bg-slate-200 w-full items-center justify-between flex p-2">
+    <div className="container mx-auto p-4">
+      <div className="bg-slate-200 w-full items-center justify-between flex p-2 mb-4">
         <div className="flex gap-4 items-center">
-          <input
+          <Input
             placeholder="Enter an organization"
             onChange={handleAddOrg}
             value={newOrg}
             className="border rounded-md p-2"
           />
+          <Select onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Status</SelectLabel>
+                {statuses.map((status) => (
+                  <SelectItem key={status} value={status} className="">
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={addOrg} className="bg-green-600">
           Add Organization
         </Button>
       </div>
-      <div>
-        {orgList.map((org) => ( 
-          <Organization
-            key={org.id}
-            id={org.id}
-            orgName={org.orgName}
-            handleDeleteOrg={handleDeleteOrg}
-            temperature={org.temperature}
-            status="beginning"
-            users={"John"}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {statuses.map((status) => (
+          <div
+            key={status}
+            className="flex flex-col items-center p-4 bg-gray-100 rounded-md"
+          >
+            <h2 className="text-xl font-bold mb-2">{status}</h2>
+            <div className="flex flex-col gap-2 w-full">
+              {orgList
+                .filter((org) => org.status === status)
+                .map((org) => (
+                  <Organization
+                    key={org.id}
+                    id={org.id}
+                    orgName={org.orgName}
+                    handleDeleteOrg={handleDeleteOrg}
+                    temperature={org.temperature}
+                    status={org.status}
+                    users={org.users}
+                    addUserToOrg={addUserToOrg}
+                  />
+                ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
