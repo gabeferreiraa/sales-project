@@ -7,9 +7,11 @@ const Organization = ({
   id,
   orgName,
   status,
+  notes,
   users,
   handleDeleteOrg,
   addUserToOrg,
+  updateOrgDetails,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -32,9 +34,10 @@ const Organization = ({
       <OrgModal
         open={modalOpen}
         onClose={handleCloseModal}
-        orgDetails={{ id, orgName, status, users }}
+        orgDetails={{ id, orgName, status, notes, users }}
         addUserToOrg={addUserToOrg}
         handleDeleteOrg={handleDeleteOrg}
+        updateOrgDetails={updateOrgDetails}
       />
     </div>
   );

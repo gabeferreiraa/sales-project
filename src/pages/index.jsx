@@ -1,8 +1,6 @@
-// src/pages/index.jsx
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import Organization from "@/components/customComponents/Organization";
-import OrgImage from "@/components/customComponents/OrgImage";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -52,8 +50,11 @@ export default function Home() {
       temperature: "",
       status: newStatus,
       users: [],
+      notes: "", // Initialize notes
     };
     setOrgList([...orgList, org]);
+    setNewOrg("");
+    setNewStatus("conversation");
   };
 
   const handleDeleteOrg = (id) => {
@@ -64,6 +65,16 @@ export default function Home() {
     const updatedOrgs = orgList.map((org) => {
       if (org.id === orgId) {
         return { ...org, users: [...org.users, newUser] };
+      }
+      return org;
+    });
+    setOrgList(updatedOrgs);
+  };
+
+  const updateOrgDetails = (orgId, updatedDetails) => {
+    const updatedOrgs = orgList.map((org) => {
+      if (org.id === orgId) {
+        return { ...org, ...updatedDetails };
       }
       return org;
     });
@@ -93,7 +104,7 @@ export default function Home() {
             value={newOrg}
             className="border rounded-md p-2"
           />
-          <Select onValueChange={handleStatusChange}>
+          <Select onValueChange={handleStatusChange} value={newStatus}>
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
@@ -132,7 +143,9 @@ export default function Home() {
                     temperature={org.temperature}
                     status={org.status}
                     users={org.users}
+                    notes={org.notes}
                     addUserToOrg={addUserToOrg}
+                    updateOrgDetails={updateOrgDetails}
                   />
                 ))}
             </div>
