@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Checkbox } from "@/components/ui/checkbox"; // Assuming you have a Checkbox component in your UI library
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectTrigger,
@@ -17,7 +17,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserProfile from "./User";
 
 class User {
   constructor(
@@ -27,7 +27,8 @@ class User {
     email,
     avatar = "",
     is_lead = false,
-    jobTitle = ""
+    jobTitle = "",
+    userNotes = ""
   ) {
     this.org = org;
     this.firstName = firstName;
@@ -36,6 +37,7 @@ class User {
     this.avatar = avatar;
     this.is_lead = is_lead;
     this.jobTitle = jobTitle;
+    this.userNotes = userNotes;
   }
 }
 
@@ -53,11 +55,12 @@ const OrgModal = ({
   const [avatar, setAvatar] = useState("");
   const [isLead, setIsLead] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
-  const [notes, setNotes] = useState(orgDetails.notes || "");
+  const [userNotes, setUserNotes] = useState("");
+  const [orgNotes, setOrgNotes] = useState(orgDetails.notes || "");
   const [status, setStatus] = useState(orgDetails.status || "");
 
   useEffect(() => {
-    setNotes(orgDetails.notes || "");
+    setOrgNotes(orgDetails.notes || "");
     setStatus(orgDetails.status || "");
   }, [orgDetails]);
 
@@ -69,7 +72,8 @@ const OrgModal = ({
       email,
       avatar,
       isLead,
-      jobTitle
+      jobTitle,
+      userNotes
     );
     addUserToOrg(orgDetails.id, newUser);
     setFirstName("");
@@ -78,6 +82,7 @@ const OrgModal = ({
     setAvatar("");
     setIsLead(false);
     setJobTitle("");
+    setUserNotes("");
   };
 
   const handleDelete = () => {
@@ -90,9 +95,19 @@ const OrgModal = ({
     updateOrgDetails(orgDetails.id, { status: value });
   };
 
-  const handleNotesChange = (e) => {
-    setNotes(e.target.value);
+  const handleOrgNotesChange = (e) => {
+    setOrgNotes(e.target.value);
     updateOrgDetails(orgDetails.id, { notes: e.target.value });
+  };
+
+  const handleUserNotesChange = (e, email) => {
+    const updatedUsers = orgDetails.users.map((user) => {
+      if (user.email === email) {
+        user.userNotes = e.target.value;
+      }
+      return user;
+    });
+    updateOrgDetails(orgDetails.id, { users: updatedUsers });
   };
 
   // sorts for lead to be on top
@@ -110,7 +125,24 @@ const OrgModal = ({
               <DrawerHeader>
                 <DrawerTitle>Organization Details</DrawerTitle>
                 <DrawerDescription>
-                  <div className="flex gap-10">
+                  <div className="flex gap-10 min-h-96">
+                    <div className="w-96 p-4 gap-12 flex flex-col">
+                      <div className="flex flex-col gap-6 font-bold">
+                        <h1 className="text-3xl text-black">
+                          {orgDetails.orgName}
+                        </h1>
+                        {/* <p className="text-sm">ORG Location</p>
+                        <p className="text-sm">ORG Hours</p> */}
+                      </div>
+                      <div className="flex flex-col">
+                        <h3>Organization Notes:</h3>
+                        <textarea
+                          value={orgNotes}
+                          onChange={handleOrgNotesChange}
+                          className="border rounded-md p-2 mt-2"
+                        />
+                      </div>
+                    </div>
                     <div className="flex flex-col w-96 gap-2">
                       <h3>Add User:</h3>
                       <Input
@@ -148,52 +180,14 @@ const OrgModal = ({
                         Add User
                       </Button>
                     </div>
-                    <div className="flex flex-col w-96 gap-2">
-                      <h3>Organization Notes:</h3>
-                      <Input
-                        placeholder="Notes"
-                        value={notes}
-                        onChange={handleNotesChange}
-                        className="border rounded-md p-2 mt-2"
-                      />
-                      <h3>Organization Status:</h3>
-                      <Select value={status} onValueChange={handleStatusChange}>
-                        <SelectTrigger>
-                          <span>{status}</span>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="conversation">
-                            Conversation
-                          </SelectItem>
-                          <SelectItem value="prospect">Prospect</SelectItem>
-                          <SelectItem value="outbound">Outbound</SelectItem>
-                          <SelectItem value="demo">Demo</SelectItem>
-                          <SelectItem value="sale">Sale</SelectItem>
-                          <SelectItem value="dead">Dead</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
                     <div className="flex flex-col gap-2 w-96">
                       <h3>Users:</h3>
                       {sortedUsers.map((user) => (
-                        <div
+                        <UserProfile
                           key={user.email}
-                          className="flex items-center space-x-2"
-                        >
-                          <Avatar>
-                            <AvatarImage
-                              src={user.avatar}
-                              alt={`${user.firstName} ${user.lastName}`}
-                            />
-                            <AvatarFallback>{`${user.firstName[0]}${user.lastName[0]}`}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className={user.is_lead ? "font-bold" : ""}>
-                              {`${user.firstName} ${user.lastName}`}
-                            </span>
-                            <span>{user.jobTitle}</span>
-                          </div>
-                        </div>
+                          user={user}
+                          handleUserNotesChange={handleUserNotesChange}
+                        />
                       ))}
                     </div>
                     <Button
