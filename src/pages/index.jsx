@@ -19,8 +19,13 @@ export default function Home() {
 
   // Load organization data
   useEffect(() => {
-    const storedOrgs = localStorage.getItem("orgList");
-    setOrgList(storedOrgs ? JSON.parse(storedOrgs) : []);
+    // const storedOrgs = localStorage.getItem("orgList");
+    // setOrgList(storedOrgs ? JSON.parse(storedOrgs) : []);
+    (async () => {
+      const results = await fetch("http://localhost:3001/organizations");
+      const data = await results.json();
+      setOrgList(data.organizations);
+    })();
   }, []);
 
   // Save organization data
@@ -34,19 +39,31 @@ export default function Home() {
 
   const handleStatusChange = (value) => setNewStatus(value);
 
-  const addOrg = () => {
+  const addOrg = async () => {
     if (newOrg.trim()) {
       const org = {
-        id: orgList.length === 0 ? 1 : orgList[orgList.length - 1].id + 1,
-        orgName: newOrg,
+        name: newOrg,
         temperature: "",
         status: newStatus,
-        users: [],
         notes: "",
       };
-      setOrgList((prevOrgList) => [...prevOrgList, org]);
-      setNewOrg("");
-      setNewStatus("conversation");
+
+      try {
+        const response = await fetch("http://localhost:3001/organizations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(org),
+        });
+
+        const data = await response.json();
+        setOrgList((prevOrgList) => [...prevOrgList, data.organization]);
+        setNewOrg("");
+        setNewStatus("conversation");
+      } catch (error) {
+        console.error("Error adding organization:", error);
+      }
     }
   };
 
@@ -136,7 +153,7 @@ export default function Home() {
                     <Organization
                       key={org.id}
                       id={org.id}
-                      orgName={org.orgName}
+                      organization={org.organization}
                       handleDeleteOrg={handleDeleteOrg}
                       temperature={org.temperature}
                       status={org.status}

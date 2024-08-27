@@ -22,21 +22,21 @@ import UserProfile from "./User";
 class User {
   constructor(
     org,
-    firstName,
-    lastName,
+    first_name,
+    last_name,
     email,
     avatar = "",
     is_lead = false,
-    jobTitle = "",
+    job_title = "",
     userNotes = ""
   ) {
     this.org = org;
-    this.firstName = firstName;
-    this.lastName = lastName;
+    this.first_name = first_name;
+    this.last_name = last_name;
     this.email = email;
     this.avatar = avatar;
     this.is_lead = is_lead;
-    this.jobTitle = jobTitle;
+    this.job_title = job_title;
     this.userNotes = userNotes;
   }
 }
@@ -49,12 +49,12 @@ const OrgModal = ({
   handleDeleteOrg,
   updateOrgDetails,
 }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [first_name, setfirst_name] = useState("");
+  const [last_name, setlast_name] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [isLead, setIsLead] = useState(false);
-  const [jobTitle, setJobTitle] = useState("");
+  const [is_lead, setis_lead] = useState(false);
+  const [job_title, setjob_title] = useState("");
   const [userNotes, setUserNotes] = useState("");
   const [orgNotes, setOrgNotes] = useState(orgDetails.notes || "");
   const [status, setStatus] = useState(orgDetails.status || "");
@@ -67,21 +67,21 @@ const OrgModal = ({
   const handleAddUser = () => {
     const newUser = new User(
       orgDetails.orgName,
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       avatar,
-      isLead,
-      jobTitle,
+      is_lead,
+      job_title,
       userNotes
     );
     addUserToOrg(orgDetails.id, newUser);
-    setFirstName("");
-    setLastName("");
+    setfirst_name("");
+    setlast_name("");
     setEmail("");
     setAvatar("");
-    setIsLead(false);
-    setJobTitle("");
+    setis_lead(false);
+    setjob_title("");
     setUserNotes("");
   };
 
@@ -125,7 +125,7 @@ const OrgModal = ({
               <DrawerHeader>
                 <DrawerTitle>Organization Details</DrawerTitle>
                 <DrawerDescription>
-                  <div className="flex gap-10 min-h-96">
+                  <div className="flex gap-20 min-h-96">
                     <div className="w-96 p-4 gap-12 flex flex-col">
                       <div className="flex flex-col gap-6 font-bold">
                         <h1 className="text-3xl text-black">
@@ -147,14 +147,14 @@ const OrgModal = ({
                       <h3>Add User:</h3>
                       <Input
                         placeholder="First Name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        value={first_name}
+                        onChange={(e) => setfirst_name(e.target.value)}
                         className="border rounded-md p-2 mt-2"
                       />
                       <Input
                         placeholder="Last Name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        value={last_name}
+                        onChange={(e) => setlast_name(e.target.value)}
                         className="border rounded-md p-2 mt-2"
                       />
                       <Input
@@ -165,14 +165,14 @@ const OrgModal = ({
                       />
                       <Input
                         placeholder="Job Title"
-                        value={jobTitle}
-                        onChange={(e) => setJobTitle(e.target.value)}
+                        value={job_title}
+                        onChange={(e) => setjob_title(e.target.value)}
                         className="border rounded-md p-2 mt-2"
                       />
                       <div className="flex items-center mt-2">
                         <Checkbox
-                          checked={isLead}
-                          onCheckedChange={(checked) => setIsLead(checked)}
+                          checked={is_lead}
+                          onCheckedChange={(checked) => setis_lead(checked)}
                         />
                         <label className="ml-2">Is Lead</label>
                       </div>
@@ -191,7 +191,7 @@ const OrgModal = ({
                       ))}
                     </div>
                     <Button
-                      className="fixed right-2 bottom-2"
+                      className="fixed left-4 bottom-4"
                       variant="destructive"
                       onClick={handleDelete}
                     >

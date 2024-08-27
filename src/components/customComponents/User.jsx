@@ -8,15 +8,15 @@ const UserProfile = ({ user, handleUserNotesChange }) => {
         <Avatar>
           <AvatarImage
             src={user.avatar}
-            alt={`${user.firstName} ${user.lastName}`}
+            alt={`${user.first_name} ${user.last_name}`}
           />
-          <AvatarFallback>{`${user.firstName[0]}${user.lastName[0]}`}</AvatarFallback>
+          <AvatarFallback>{`${user.first_name[0]}${user.last_name[0]}`}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
           <span className={user.is_lead ? "font-bold text-black" : ""}>
-            {`${user.firstName} ${user.lastName}`}
+            {`${user.first_name} ${user.last_name}`}
           </span>
-          <span>{user.jobTitle}</span>
+          <span>{user.job_title}</span>
         </div>
       </div>
       <textarea
