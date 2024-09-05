@@ -8,7 +8,11 @@ const UsersDisplay = ({ id }) => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     (async () => {
-      const res = await fetch(`${API_URL}/organizations/${id}/users`);
+      const res = await fetch(`${API_URL}/organizations/${id}/users`, {
+        mode: "cors",
+        credentials: "include",
+      });
+
       const data = await res.json();
       setUsers(data.users);
       console.log(data);

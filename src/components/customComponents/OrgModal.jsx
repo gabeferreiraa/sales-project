@@ -121,6 +121,8 @@ const OrgModal = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newUser),
+        mode: "cors",
+        credentials: "include",
       });
 
       const data = await response.json();

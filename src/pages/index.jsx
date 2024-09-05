@@ -26,7 +26,10 @@ export default function Home() {
     // const storedOrgs = localStorage.getItem("orgList");
     // setOrgList(storedOrgs ? JSON.parse(storedOrgs) : []);
     (async () => {
-      const results = await fetch(`${API_URL}/organizations`);
+      const results = await fetch(`${API_URL}/organizations`, {
+        mode: "cors",
+        credentials: "include",
+      });
       const data = await results.json();
       setOrgList(data.organizations);
     })();
@@ -60,6 +63,8 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(org),
+        mode: "cors",
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -79,6 +84,8 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
+        mode: "cors",
+        credentials: "include",
       });
 
       const data = await response.json();
