@@ -3,12 +3,7 @@ import { Dialog, DialogContent } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { API_URL } from "@/lib/urls";
 import {
   Drawer,
   DrawerContent,
@@ -18,6 +13,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import UserProfile from "./User";
+import Organization from "./Organization";
+import UsersDisplay from "./UsersDisplay";
 
 class User {
   constructor(
@@ -85,11 +82,6 @@ const OrgModal = ({
     setUserNotes("");
   };
 
-  const handleDelete = () => {
-    handleDeleteOrg(orgDetails.id);
-    onClose();
-  };
-
   const handleStatusChange = (value) => {
     setStatus(value);
     updateOrgDetails(orgDetails.id, { status: value });
@@ -110,10 +102,62 @@ const OrgModal = ({
     updateOrgDetails(orgDetails.id, { users: updatedUsers });
   };
 
-  // sorts for lead to be on top
-  const sortedUsers = [...orgDetails.users].sort(
-    (a, b) => b.is_lead - a.is_lead
-  );
+  const addUser = async () => {
+    const newUser = {
+      organization_id: orgDetails.id, // Use the correct organization ID
+      email: email.trim(),
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      job_title: job_title.trim(),
+      is_lead: is_lead,
+      notes: userNotes.trim(),
+      avatar: avatar.trim(),
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok) {
+        addUserToOrg(orgDetails.id, data.user); // Add user to organization
+      } else {
+        console.error("Failed to add user:", data.message);
+      }
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
+  };
+  const deleteUser = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok) {
+        setUserList((prevUserList) =>
+          prevUserList.filter((user) => user.id !== userId)
+        );
+      } else {
+        console.error("Failed to delete user:", data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
 
   return (
     <div className="font-sans">
@@ -129,7 +173,7 @@ const OrgModal = ({
                     <div className="w-96 p-4 gap-12 flex flex-col">
                       <div className="flex flex-col gap-6 font-bold">
                         <h1 className="text-3xl text-black">
-                          {orgDetails.orgName}
+                          {orgDetails.name}
                         </h1>
                         {/* <p className="text-sm">ORG Location</p>
                         <p className="text-sm">ORG Hours</p> */}
@@ -176,24 +220,17 @@ const OrgModal = ({
                         />
                         <label className="ml-2">Is Lead</label>
                       </div>
-                      <Button onClick={handleAddUser} className="">
+                      <Button onClick={addUser} className="">
                         Add User
                       </Button>
                     </div>
                     <div className="flex flex-col gap-2 w-96">
-                      <h3>Users:</h3>
-                      {sortedUsers.map((user) => (
-                        <UserProfile
-                          key={user.email}
-                          user={user}
-                          handleUserNotesChange={handleUserNotesChange}
-                        />
-                      ))}
+                      <UsersDisplay id={orgDetails.id} />
                     </div>
                     <Button
                       className="fixed left-4 bottom-4"
                       variant="destructive"
-                      onClick={handleDelete}
+                      onClick={() => handleDeleteOrg(orgDetails.id)}
                     >
                       Delete Organization
                     </Button>

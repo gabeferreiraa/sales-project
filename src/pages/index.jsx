@@ -12,17 +12,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { API_URL } from "@/lib/urls";
+
 export default function Home() {
   const [newOrg, setNewOrg] = useState("");
+  const [temperature, setTemperature] = useState("");
   const [newStatus, setNewStatus] = useState("conversation");
   const [orgList, setOrgList] = useState([]);
+  const [notes, setNotes] = useState("");
 
   // Load organization data
   useEffect(() => {
     // const storedOrgs = localStorage.getItem("orgList");
     // setOrgList(storedOrgs ? JSON.parse(storedOrgs) : []);
     (async () => {
-      const results = await fetch("http://localhost:3001/organizations");
+      const results = await fetch(`${API_URL}/organizations`);
       const data = await results.json();
       setOrgList(data.organizations);
     })();
@@ -40,30 +44,50 @@ export default function Home() {
   const handleStatusChange = (value) => setNewStatus(value);
 
   const addOrg = async () => {
-    if (newOrg.trim()) {
-      const org = {
-        name: newOrg,
-        temperature: "",
-        status: newStatus,
-        notes: "",
-      };
+    const formattedOrgName = newOrg.trim();
+    const setTemperature = temperature;
+    const org = {
+      name: formattedOrgName,
+      temperature: "cold",
+      status: newStatus,
+      notes: "",
+    };
 
-      try {
-        const response = await fetch("http://localhost:3001/organizations", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(org),
-        });
+    try {
+      const response = await fetch(`${API_URL}/organizations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(org),
+      });
 
-        const data = await response.json();
-        setOrgList((prevOrgList) => [...prevOrgList, data.organization]);
-        setNewOrg("");
-        setNewStatus("conversation");
-      } catch (error) {
-        console.error("Error adding organization:", error);
-      }
+      const data = await response.json();
+      console.log(data);
+      setOrgList((prevOrgList) => [...prevOrgList, data.organization]);
+      setNewOrg("");
+      // setNewStatus("conversation");
+    } catch (error) {
+      console.error("Error adding organization:", error);
+    }
+  };
+
+  const deleteOrg = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/organizations/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log(data);
+      setOrgList(orgList.filter((org) => org.id != id));
+
+      // setNewStatus("conversation");
+    } catch (error) {
+      console.error("Error adding organization:", error);
     }
   };
 
@@ -72,24 +96,10 @@ export default function Home() {
   };
 
   const addUserToOrg = (orgId, newUser) => {
-    const updatedOrgs = orgList.map((org) =>
-      org.id === orgId ? { ...org, users: [...org.users, newUser] } : org
-    );
-    setOrgList(updatedOrgs);
+    console.log();
   };
 
-  const deleteUserFromOrg = (orgId, userId) => {
-    const updatedOrgs = orgList.map((org) => {
-      if (org.id === orgId) {
-        return {
-          ...org,
-          users: org.users.filter((user) => user.id !== userId),
-        };
-      }
-      return org;
-    });
-    setOrgList(updatedOrgs);
-  };
+  const deleteUserFromOrg = (orgId, userId) => {};
 
   const updateOrgDetails = (orgId, updatedDetails) => {
     const updatedOrgs = orgList.map((org) =>
@@ -153,8 +163,8 @@ export default function Home() {
                     <Organization
                       key={org.id}
                       id={org.id}
-                      organization={org.organization}
-                      handleDeleteOrg={handleDeleteOrg}
+                      name={org.name} // Ensure `org.name` is correct here
+                      handleDeleteOrg={deleteOrg}
                       temperature={org.temperature}
                       status={org.status}
                       users={org.users}

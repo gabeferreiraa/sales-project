@@ -1,7 +1,8 @@
 import React from "react";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const UserProfile = ({ user, handleUserNotesChange }) => {
+const UserProfile = ({ user, deleteUser }) => {
   return (
     <div className="flex flex-col space-y-2 border p-2 rounded-md">
       <div className="flex items-center space-x-2">
@@ -25,6 +26,13 @@ const UserProfile = ({ user, handleUserNotesChange }) => {
         onChange={(e) => handleUserNotesChange(e, user.email)}
         className="border rounded-md p-2"
       />
+      <Button
+        onClick={() => deleteUser(user.id)}
+        variant="destructive"
+        className="mt-2"
+      >
+        Delete User
+      </Button>
     </div>
   );
 };
