@@ -123,6 +123,7 @@ const OrgModal = ({
         body: JSON.stringify(newUser),
         mode: "cors",
         credentials: "include",
+        cache: "no-store",
       });
 
       const data = await response.json();
@@ -144,6 +145,7 @@ const OrgModal = ({
         headers: {
           "Content-Type": "application/json",
         },
+        cache: "no-store",
       });
 
       const data = await response.json();

@@ -11,6 +11,7 @@ const UsersDisplay = ({ id }) => {
       const res = await fetch(`${API_URL}/organizations/${id}/users`, {
         mode: "cors",
         credentials: "include",
+        cache: "no-store",
       });
 
       const data = await res.json();

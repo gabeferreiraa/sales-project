@@ -29,6 +29,7 @@ export default function Home() {
       const results = await fetch(`${API_URL}/organizations`, {
         mode: "cors",
         credentials: "include",
+        cache: "no-store",
       });
       const data = await results.json();
       setOrgList(data.organizations);
@@ -65,6 +66,7 @@ export default function Home() {
         body: JSON.stringify(org),
         mode: "cors",
         credentials: "include",
+        cache: "no-store",
       });
 
       const data = await response.json();
@@ -86,6 +88,7 @@ export default function Home() {
         },
         mode: "cors",
         credentials: "include",
+        cache: "no-store",
       });
 
       const data = await response.json();
